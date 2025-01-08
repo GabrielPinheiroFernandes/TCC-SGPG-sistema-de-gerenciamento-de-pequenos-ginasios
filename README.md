@@ -35,10 +35,9 @@ Para instruções detalhadas sobre como iniciar e configurar o backend e o front
 ## Contato 📞
 Para dúvidas ou mais informações, entre em contato com os desenvolvedores:
 
-Gabriel Pinheiro Fernandes
-Flávio henrique lopes de almeida
+**Gabriel Pinheiro Fernandes**  
+**Flávio Henrique Lopes de Almeida**
 
 Curso de Tecnologia em Análise e Desenvolvimento de Sistemas  
 Faculdade de Tecnologia Dep. Júlio Julinho Marcondes Moura  
 Garça, 2024
-
