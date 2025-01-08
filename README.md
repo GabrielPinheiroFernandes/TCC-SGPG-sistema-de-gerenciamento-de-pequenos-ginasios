@@ -33,9 +33,11 @@ Atualmente, sistemas de gestão para academias frequentemente oferecem uma gama 
 Para instruções detalhadas sobre como iniciar e configurar o backend e o frontend, consulte os arquivos `README.md` localizados nas respectivas pastas do projeto.
 
 ## Contato 📞
-Para dúvidas ou mais informações, entre em contato com o desenvolvedor:
+Para dúvidas ou mais informações, entre em contato com os desenvolvedores:
 
-Gabriel Pinheiro Fernandes  
+Gabriel Pinheiro Fernandes
+Flávio henrique lopes de almeida
+
 Curso de Tecnologia em Análise e Desenvolvimento de Sistemas  
 Faculdade de Tecnologia Dep. Júlio Julinho Marcondes Moura  
 Garça, 2024
