@@ -2,115 +2,109 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function user(Request $request)
     {
-        //
+        return response()->json($request->user());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function login(Request $request)
     {
-        //
-    }
+        // Validação das credenciais
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        try {
-            // Validando os dados da requisição
-            $data = $request->validate(
-                [
-                    'name' => 'required|string|max:255',
-                    'email' => 'required|string|email|max:255|unique:users',
-                    'password' => 'required|string|min:8',
-                ]
-            );
-
-            // Criando o novo usuário
-            $user = User::create(
-                [
-                    'name' => $data['name'],
-                    'email' => $data['email'],
-                    'password' => Hash::make($data['password']),
-                ]
-            );
-
-            // Retornando os dados do novo usuário em formato JSON
-            return response()->json($user, 201);
-
-        } catch (ValidationException $e) {
-            // Retornando os erros de validação
-            return response()->json(['errors' => $e->errors()], 422);
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
-
-    public function logginAttempt(Request $request)
-    {
-        // Validando os dados da requisição
-        $credentials = $request->validate(
-            [
-                'email' => 'required|email',
-                'password' => 'required'
-            ]
-        );
-
-        // Tentativa de autenticação
+        // Verifica se as credenciais são válidas
         if (Auth::attempt($credentials)) {
-            // Regenerando a sessão para evitar ataques de fixação de sessão
-            $request->session()->regenerate();
+            $user = Auth::user(); // Obtém o usuário autenticado
 
-            // Retornando uma resposta JSON de sucesso
-            return response()->json(['message' => 'Login successful'], 200);
-        } else {
-            // Retornando uma resposta JSON de falha
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            // Gera o token de autenticação Sanctum
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+            ]);
+        }
+
+        return response()->json(['message' => 'Invalid credentials'], 401);
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user(); // Obtém o usuário autenticado
+
+        if ($user) {
+            // Deleta o token atual do usuário autenticado
+            $user->currentAccessToken()->delete();
+
+            return response()->json([
+                'message' => 'Logout realizado com sucesso',
+                'user_logged_out' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                ],
+            ]);
+        }
+
+        return response()->json(['message' => 'Usuário não autenticado'], 401);
+    }
+
+    public function register(Request $request)
+    {
+        // Validação dos dados recebidos
+        $credentials = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        try {
+            // Criando o usuário com a senha criptografada
+            $user = \App\Models\User::create([
+                'name' => $credentials['name'],
+                'email' => $credentials['email'],
+                'password' => bcrypt($credentials['password']),
+            ]);
+
+            // Verifica se o usuário foi realmente criado
+            if (!$user) {
+                return response()->json([
+                    'message' => 'Erro ao criar usuário. Tente novamente.',
+                ], 500);
+            }
+
+            // Gerando o token de autenticação
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            // Retornando a resposta com o token e os detalhes do usuário
+            return response()->json([
+                'message' => 'Usuário registrado com sucesso!',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro interno no servidor.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
+
 }

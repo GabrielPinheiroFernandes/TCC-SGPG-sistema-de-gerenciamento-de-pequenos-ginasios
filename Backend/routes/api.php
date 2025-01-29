@@ -1,16 +1,34 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get("/", function (Request $request) {
-    return response()->json(["deucerto" => "true"]);
-});
+/*
+|----------------------------------------------------------------------
+| API Routes
+|----------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application.
+|
+*/
 
-Route::post("/login",  [AuthController::class, "logginAttempt"]);
+/*
+|----------------------------------------------------------------------
+| Auth Routes
+|----------------------------------------------------------------------
+*/
 
-Route::prefix('/user')->group(function () {
-    // Defina suas rotas aqui
-    Route::post('/create', [AuthController::class, 'store']);
+// Rota de login
+Route::post('/login', [AuthController::class, 'login']);
+
+// Rota de registro
+Route::post('/register', [AuthController::class, 'register']);
+
+// Rotas protegidas com autenticação Sanctum
+Route::middleware('auth:sanctum')->group(function () {
+    // Rota de logout
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Rota para retornar o usuário autenticado
+    Route::get('/user', [AuthController::class, 'user']);
 });
