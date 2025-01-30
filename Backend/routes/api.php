@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Rota de login
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login']);
 
 // Rota de registro
 Route::post('/register', [AuthController::class, 'register']);

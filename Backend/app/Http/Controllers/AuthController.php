@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,34 +13,31 @@ class AuthController extends Controller
         return response()->json($request->user());
     }
 
-    public function login(Request $request)
-    {
-        // Validação das credenciais
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+    public function login(LoginRequest $request)
+{
+    $credentials = $request->validated(); // Obtemos os dados validados
+
+    if (Auth::attempt($credentials)) {
+        $user = Auth::user();
+
+        // Gera o token de autenticação
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
         ]);
-
-        // Verifica se as credenciais são válidas
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user(); // Obtém o usuário autenticado
-
-            // Gera o token de autenticação Sanctum
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            return response()->json([
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                ],
-            ]);
-        }
-
-        return response()->json(['message' => 'Invalid credentials'], 401);
     }
+
+    return response()->json(['message' => 'Invalid credentials'], 401);
+}
+
+
 
     public function logout(Request $request)
     {
