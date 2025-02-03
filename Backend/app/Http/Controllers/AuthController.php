@@ -28,7 +28,8 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
             'user' => [
                 'id' => $user->id,
-                'name' => $user->name,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
                 'email' => $user->email,
             ],
         ]);
@@ -63,39 +64,43 @@ class AuthController extends Controller
     {
         // Validação dos dados recebidos
         $credentials = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
+            'birth_date' => 'required|date',
+            'height' => 'required|numeric',
+            'weight' => 'required|numeric',
+            'sex' => 'required|in:M,F',
+            'cpf' => 'nullable|string|unique:users,cpf',
         ]);
 
         try {
-            // Criando o usuário com a senha criptografada
+            // Criando o usuário com os campos corretos
             $user = \App\Models\User::create([
-                'name' => $credentials['name'],
+                'first_name' => $credentials['first_name'],
+                'last_name' => $credentials['last_name'],
                 'email' => $credentials['email'],
                 'password' => bcrypt($credentials['password']),
+                'birth_date' => $credentials['birth_date'],
+                'height' => $credentials['height'],
+                'weight' => $credentials['weight'],
+                'sex' => $credentials['sex'],
+                'cpf' => $credentials['cpf'] ?? null,
             ]);
 
-            // Verifica se o usuário foi realmente criado
             if (!$user) {
-                return response()->json([
-                    'message' => 'Erro ao criar usuário. Tente novamente.',
-                ], 500);
+                return response()->json(['message' => 'Erro ao criar usuário.'], 500);
             }
 
             // Gerando o token de autenticação
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            // Retornando a resposta com o token e os detalhes do usuário
             return response()->json([
                 'message' => 'Usuário registrado com sucesso!',
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                ],
+                'user' => $user,
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -104,5 +109,7 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+
 
 }

@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->boolean('is_admin')->default(false);
+            $table->date('birth_date');
+            $table->decimal('height', 5, 2); // Exemplo: 1.75
+            $table->decimal('weight', 5, 2); // Exemplo: 70.50
+            $table->char('sex', 1); // 'F' ou 'M'
+            $table->string('cpf', 11)->unique()->nullable(); // CPF tem 11 caracteres
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
@@ -21,6 +28,7 @@ return new class extends Migration
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
