@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Holidays;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -44,5 +45,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('senha123'),
         ]);
 
+
+        Holidays::factory('10')->create();
     }
 }
