@@ -1,0 +1,100 @@
+import Footer from "../components/Footer";
+import images from "../constants/images";
+
+export default function Home() {
+  return (
+    <div className="w-full min-h-screen bg-white text-black">
+      {/* Navbar */}
+      <header className="w-full flex justify-between items-center px-6 py-4 bg-black text-white">
+        <div className="text-2xl font-bold">
+          STUDIO <span className="text-blue-800">FOCUS</span>
+        </div>
+        <nav className="hidden md:flex space-x-6">
+          <a href="#" className="hover:text-blue-400">Treinos</a>
+          <a href="#" className="hover:text-blue-400">Suplementação</a>
+          <a href="#" className="hover:text-blue-400">Aulas</a>
+        </nav>
+        <button className="bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Login / Cadastro
+        </button>
+      </header>
+
+      {/* Seção 1: Banner Principal */}
+      <section
+        className="w-full h-[90vh] bg-cover bg-center relative"
+        style={{ backgroundImage: `url(${images.banner})` }}
+      >
+        <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center px-6 md:px-20">
+          <h1 className="text-white text-3xl md:text-5xl font-bold mb-4">
+            BEM VINDO A <br />
+            STUDIO <span className="text-blue-800">FOCUS</span>
+          </h1>
+          <button className="bg-blue-800 text-white w-max px-6 py-3 rounded hover:bg-blue-700">
+            SAIBA MAIS
+          </button>
+        </div>
+      </section>
+
+      {/* Seção 2: Imagem com texto no centro */}
+      <section
+        className="w-full h-[500px] bg-cover bg-center relative"
+        style={{ backgroundImage: `url(${images.treino1})` }}
+      >
+        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+          <h2 className="text-white text-4xl font-bold text-center">
+            ALCANCE SUA MELHOR VERSÃO
+          </h2>
+        </div>
+      </section>
+
+      {/* Seção 3: Logo com fundo azul e imagem */}
+      <section className="flex flex-col md:flex-row w-full h-[400px]">
+        <div className="md:w-1/2 w-full h-full bg-cover bg-center relative"  style={{ backgroundImage: `url(${images.treino2})` }}>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <img src={images.logo} alt="Logo" className="w-40 h-40 object-contain" />
+          </div>
+        </div>
+        <div className="md:w-1/2 w-full bg-blue-800 flex items-center justify-center" />
+      </section>
+
+      {/* Seção 4: Imagem com formulário */}
+      <section className="flex flex-col md:flex-row w-full">
+        <div className="md:w-1/2 w-full">
+          <img src={images.treino3} alt="Treino 3" className="w-full h-full object-cover" />
+        </div>
+        <div className="md:w-1/2 w-full flex items-center justify-center p-8 bg-white">
+          <div className="w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-2">
+              COMECE A TREINAR <span className="text-blue-800">HOJE MESMO</span>
+            </h2>
+            <p className="mb-6 text-sm font-bold text-black">COM MENSALIDADE A PARTIR DE R$ 50 POR MÊS</p>
+            <form className="flex flex-col gap-4">
+              <input
+                type="text"
+                placeholder="Nome"
+                className="p-3 rounded border border-gray-300"
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                className="p-3 rounded border border-gray-300"
+              />
+              <input
+                type="tel"
+                placeholder="Telefone"
+                className="p-3 rounded border border-gray-300"
+              />
+              <button
+                type="submit"
+                className="bg-blue-800 text-white py-3 rounded hover:bg-blue-800 font-semibold"
+              >
+                MATRÍCULE-SE AGORA
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+      <Footer />
+    </div>
+  );
+}

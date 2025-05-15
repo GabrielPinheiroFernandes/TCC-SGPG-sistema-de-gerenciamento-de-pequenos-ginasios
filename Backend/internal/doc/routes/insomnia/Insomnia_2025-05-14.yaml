@@ -1,0 +1,156 @@
+type: collection.insomnia.rest/5.0
+name: CRUD
+meta:
+  id: wrk_51b582b2bcfd4820a81d1c1a86e6881b
+  created: 1747263434997
+  modified: 1747263461751
+collection:
+  - name: auth
+    meta:
+      id: fld_b905eecb9fe9473fb7ce7b58e70ab8cd
+      created: 1747263553476
+      modified: 1747263576480
+      sortKey: -1747263553476
+    children:
+      - url: "{{ _.localHostTcc }}/auth/login"
+        name: /login
+        meta:
+          id: req_ce5876a4c303493681a38cb0847e6da6
+          created: 1747263578490
+          modified: 1747263653111
+          isPrivate: false
+          sortKey: -1747263578490
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "first_name": "João",
+              "last_name": "Silva",
+              "email": "joao.silva@example.com",
+              "pass": "senhaSegura123",
+              "is_admin": false,
+              "birth_date": "1995-06-15T00:00:00Z",
+              "height": 1.75,
+              "weight": 70.5,
+              "sex": "M",
+              "cpf": "123.456.789-00"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.1.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: /user(auth)
+    meta:
+      id: fld_2ea45e6ed44c4c6891c3dbeb8b4312bd
+      created: 1747263785125
+      modified: 1747263785125
+      sortKey: -1747263785126
+    children:
+      - url: "{{ _.localHostTcc }}/user/"
+        name: /
+        meta:
+          id: req_1b44171e16394131b4bb9a0e31cf3509
+          created: 1747263788970
+          modified: 1747263863917
+          isPrivate: false
+          sortKey: -1747263788970
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.1.0
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDcyNjQ1MzMsInVzZXJfaWQiOjB9.OzA2_cLq2pd2fJefJp6jleKy4CQqMiiNnaYNy8zq4D0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localHostTcc }}/user/add"
+        name: /add
+        meta:
+          id: req_0c4c10b97bb547c1acea968c069471b8
+          created: 1747264340377
+          modified: 1747264409351
+          isPrivate: false
+          sortKey: -1747263789070
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "first_name": "João",
+              "last_name": "Silva",
+              "email": "joao.silva@example.com",
+              "pass": "senhaSegura123",
+              "is_admin": false,
+              "birth_date": "1995-06-15T00:00:00Z",
+              "height": 1.75,
+              "weight": 70.5,
+              "sex": "M",
+              "cpf": "12345678900"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.1.0
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDcyNjQ1MzMsInVzZXJfaWQiOjB9.OzA2_cLq2pd2fJefJp6jleKy4CQqMiiNnaYNy8zq4D0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - url: "{{ _.localHostTcc }}/ping"
+    name: /ping
+    meta:
+      id: req_2e905a3e84cb4e6a99b4296778a9c8fd
+      created: 1747263435080
+      modified: 1747263514230
+      isPrivate: false
+      sortKey: -1747263435080
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.1.0
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_8d5aa44bf095a69ab073c36f79c57336c0ae2d02
+    created: 1747263435002
+    modified: 1747263435002
+environments:
+  name: Base Environment
+  meta:
+    id: env_8d5aa44bf095a69ab073c36f79c57336c0ae2d02
+    created: 1747263434999
+    modified: 1747263541357
+    isPrivate: false
+  data:
+    localHostTcc: https://9lvtjn-8080.csb.app
