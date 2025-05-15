@@ -40,6 +40,32 @@ func (uRepo *UserRepository) DellUser(id int) error {
 }
 
 func (uRepo *UserRepository) GetUser(id int) (entitie.User, error) {
+	var users []models.User
+	_, err := uRepo.dbCli.GetAll(&users)
+	if err != nil {
+		log.Error().Err(err).Msg("Erro ao buscar usuários")
+		return entitie.User{}, err
+	}
+	for _, user := range users {
+		admin:=parseIsAdmin(user.IsAdmin)
+		if user.ID == id {
+			return entitie.User{
+				ID:           user.ID,
+				FirstName:    user.FirstName,
+				LastName:     user.LastName,
+				Email:        user.Email,
+				Pass:         user.Pass,
+				IsAdmin:      admin,
+				BirthDate:    user.BirthDate,
+				Height:       user.Height,
+				Weight:       user.Weight,
+				Sex:          user.Sex,
+				Cpf:          user.CPF,
+				Token:        "",
+				RefreshToken: "",
+			}, nil
+		}
+	}
 	return entitie.User{},nil
 }
 func (uRepo *UserRepository) GetAuthUser(userAuth entitie.Auth) (entitie.User, error) {

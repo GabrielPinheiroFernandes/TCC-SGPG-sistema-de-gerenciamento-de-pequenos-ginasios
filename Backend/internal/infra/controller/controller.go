@@ -44,6 +44,10 @@ func (cont *Controller) Process() {
 				c.JSON(http.StatusInternalServerError, gin.H{"message": "Erro ao logar"})
 				return
 			}
+			if userValid.ID == 0 {
+				c.JSON(http.StatusUnauthorized, gin.H{"message": "Usuário ou senha inválidos"})
+				return
+			}
 
 			token, err := cont.auth.Login(int(userValid.ID))
 			if err != nil {
@@ -53,7 +57,7 @@ func (cont *Controller) Process() {
 
 			userValid.SetToken(token)
 
-			c.JSON(http.StatusOK, gin.H{"message": "Usuário logado com sucesso!", "data": user})
+			c.JSON(http.StatusOK, gin.H{"message": "Usuário logado com sucesso!", "user": userValid})
 		})
 	}
 	userGroup := r.Group("/user",cont.auth.AuthMiddleware())
