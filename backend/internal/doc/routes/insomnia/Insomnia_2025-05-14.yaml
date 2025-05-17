@@ -1,13 +1,13 @@
 type: collection.insomnia.rest/5.0
 name: CRUD
 meta:
-  id: wrk_51b582b2bcfd4820a81d1c1a86e6881b
-  created: 1747263434997
-  modified: 1747263461751
+  id: wrk_d045a53f50034c0c8f83643784496631
+  created: 1747281401384
+  modified: 1747281401384
 collection:
   - name: auth
     meta:
-      id: fld_b905eecb9fe9473fb7ce7b58e70ab8cd
+      id: fld_f8b18bd7bfdc448887d7362547908b0c
       created: 1747263553476
       modified: 1747263576480
       sortKey: -1747263553476
@@ -15,9 +15,9 @@ collection:
       - url: "{{ _.localHostTcc }}/auth/login"
         name: /login
         meta:
-          id: req_ce5876a4c303493681a38cb0847e6da6
+          id: req_964cef58fb714ea5afe0a68ddea2b560
           created: 1747263578490
-          modified: 1747263653111
+          modified: 1747282706712
           isPrivate: false
           sortKey: -1747263578490
         method: POST
@@ -25,16 +25,8 @@ collection:
           mimeType: application/json
           text: |
             {
-              "first_name": "João",
-              "last_name": "Silva",
-              "email": "joao.silva@example.com",
-              "pass": "senhaSegura123",
-              "is_admin": false,
-              "birth_date": "1995-06-15T00:00:00Z",
-              "height": 1.75,
-              "weight": 70.5,
-              "sex": "M",
-              "cpf": "123.456.789-00"
+              "email": "admin@admin.com",
+              "password": "admin"
             }
         headers:
           - name: Content-Type
@@ -51,7 +43,7 @@ collection:
           rebuildPath: true
   - name: /user(auth)
     meta:
-      id: fld_2ea45e6ed44c4c6891c3dbeb8b4312bd
+      id: fld_808a72245d8c436ab5e7a1c1641367bc
       created: 1747263785125
       modified: 1747263785125
       sortKey: -1747263785126
@@ -59,7 +51,7 @@ collection:
       - url: "{{ _.localHostTcc }}/user/"
         name: /
         meta:
-          id: req_1b44171e16394131b4bb9a0e31cf3509
+          id: req_5d357ac718b24688b73ef003d17ce939
           created: 1747263788970
           modified: 1747263863917
           isPrivate: false
@@ -82,9 +74,9 @@ collection:
       - url: "{{ _.localHostTcc }}/user/add"
         name: /add
         meta:
-          id: req_0c4c10b97bb547c1acea968c069471b8
+          id: req_da41c562a985427190894f7a551b78a0
           created: 1747264340377
-          modified: 1747264409351
+          modified: 1747281895727
           isPrivate: false
           sortKey: -1747263789070
         method: POST
@@ -94,14 +86,14 @@ collection:
             {
               "first_name": "João",
               "last_name": "Silva",
-              "email": "joao.silva@example.com",
+              "email": "joao.silva1@example.com",
               "pass": "senhaSegura123",
               "is_admin": false,
               "birth_date": "1995-06-15T00:00:00Z",
               "height": 1.75,
               "weight": 70.5,
               "sex": "M",
-              "cpf": "12345678900"
+              "cpf": "12345178900"
             }
         headers:
           - name: Content-Type
@@ -119,10 +111,33 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: "{{ _.localHostTcc }}/user/2"
+        name: /{Id}
+        meta:
+          id: req_0ebca57ef56946c390dd00f153f4776f
+          created: 1747281959365
+          modified: 1747282250261
+          isPrivate: false
+          sortKey: -1747263683730
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.1.0
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDcyNjQ1MzMsInVzZXJfaWQiOjB9.OzA2_cLq2pd2fJefJp6jleKy4CQqMiiNnaYNy8zq4D0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
   - url: "{{ _.localHostTcc }}/ping"
     name: /ping
     meta:
-      id: req_2e905a3e84cb4e6a99b4296778a9c8fd
+      id: req_09c5b5408502409b996fbf4160d9daf7
       created: 1747263435080
       modified: 1747263514230
       isPrivate: false
@@ -142,15 +157,15 @@ collection:
 cookieJar:
   name: Default Jar
   meta:
-    id: jar_8d5aa44bf095a69ab073c36f79c57336c0ae2d02
+    id: jar_7392c8869796444db14359c625157afe
     created: 1747263435002
     modified: 1747263435002
 environments:
   name: Base Environment
   meta:
-    id: env_8d5aa44bf095a69ab073c36f79c57336c0ae2d02
+    id: env_f812d5b7cb0e4e079605fc13d35f3e40
     created: 1747263434999
-    modified: 1747263541357
+    modified: 1747281429988
     isPrivate: false
   data:
-    localHostTcc: https://9lvtjn-8080.csb.app
+    localHostTcc: localhost:8080

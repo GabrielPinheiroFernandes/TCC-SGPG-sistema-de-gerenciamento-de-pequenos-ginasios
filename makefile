@@ -4,6 +4,6 @@ backend:
 	cd backend && make rebuild
 
 frontend:
-	cd frontend && npm install && npm run dev
+	cd frontend && make run
 
 start: backend frontend

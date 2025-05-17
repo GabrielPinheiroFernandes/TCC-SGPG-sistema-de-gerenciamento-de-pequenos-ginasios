@@ -2,6 +2,7 @@
 
 # Executa a aplicação Go localmente
 run-dev:
+	go mod tidy
 	go run cmd/api/main.go
 
 # Sobe os containers com Docker Compose

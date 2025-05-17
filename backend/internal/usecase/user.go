@@ -45,7 +45,12 @@ func (repo *UserUsecase) GetAll() ([]entitie.User, error) {
 	return users, nil
 }
 func (uRepo *UserUsecase) GetUser(id int) (entitie.User, error) {
-	return entitie.User{},nil
+	userRet,err:=uRepo.userRepository.GetUser(id)
+	if err != nil {
+		return entitie.User{}, err
+	}
+
+	return userRet,nil
 }
 func (repo *UserUsecase) GetAuthUser(u entitie.Auth) (entitie.User, error) {
 	user,err:=repo.userRepository.GetAuthUser(u)
