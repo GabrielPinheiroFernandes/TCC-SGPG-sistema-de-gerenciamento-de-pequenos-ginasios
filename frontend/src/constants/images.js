@@ -4,12 +4,5 @@ import treino2 from '../assets/treino2.jpg'
 import treino3 from '../assets/treino3.jpg'
 import logo    from '../assets/logo.svg'
 
-const images = {
-    banner,
-    treino1,
-    treino2,
-    treino3,
-    logo,
-};
 
-export default images;
+export default {banner, treino1, treino2, treino3, logo};
