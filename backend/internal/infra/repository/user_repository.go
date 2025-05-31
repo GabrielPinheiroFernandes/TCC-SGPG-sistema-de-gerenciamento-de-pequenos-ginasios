@@ -49,6 +49,7 @@ func (uRepo *UserRepository) GetUser(id int) (entitie.User, error) {
 	for _, user := range users {
 		admin:=parseIsAdmin(user.IsAdmin)
 		if user.ID == id {
+			imageUser:=uRepo.getUserImg(int(user.ID))
 			return entitie.User{
 				ID:           user.ID,
 				FirstName:    user.FirstName,
@@ -63,6 +64,7 @@ func (uRepo *UserRepository) GetUser(id int) (entitie.User, error) {
 				Cpf:          user.CPF,
 				Token:        "",
 				RefreshToken: "",
+				UserImage:    imageUser,
 			}, nil
 		}
 	}
@@ -141,4 +143,18 @@ func parseIsAdmin(flag string) bool {
 		// Se vier qualquer outra coisa, assume false por segurança
 		return false
 	}
+}
+
+
+func (uRepo *UserRepository) getUserImg(userID int) []byte {
+	var photo models.UserImage
+	res, err := uRepo.dbCli.FindImageByID(uint(userID), &photo)
+	if err != nil {
+		log.Error().Err(err).Msg("Erro ao buscar imagem do usuário")
+		return nil
+	}
+	if foundPhoto, ok := res.(*models.UserImage); ok {
+		return foundPhoto.Img
+	}
+	return nil
 }

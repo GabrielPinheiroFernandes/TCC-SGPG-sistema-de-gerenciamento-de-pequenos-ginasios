@@ -6,5 +6,6 @@ type MysqlClient interface {
 	DeleteByID(id uint, model interface{}) error
 	Update(entity interface{}) error
 	FindByID(id uint, model interface{}) (interface{}, error)
+	FindImageByID(id uint, model interface{}) (interface{}, error)
 	GetAll(model interface{}) (interface{},error)
 }

@@ -1,5 +1,5 @@
 # Etapa 1: build da aplicação usando imagem oficial do Go
-FROM golang:1.22.2 AS build
+FROM golang:1.23 AS build
 
 # Define o diretório de trabalho no container de build
 WORKDIR /app

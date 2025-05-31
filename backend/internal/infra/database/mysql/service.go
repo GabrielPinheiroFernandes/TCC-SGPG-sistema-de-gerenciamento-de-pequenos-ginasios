@@ -54,6 +54,7 @@ func NewMysqlClient(db *gorm.DB) *MysqlClient {
 func (m *MysqlClient) Init() {
 	err := m.db.AutoMigrate(
 		&models.User{}, // Adicione mais models aqui conforme necessário
+		&models.UserImage{},
 	)
 	if err != nil {
 		log.Fatal().Msgf("❌ Erro ao rodar as migrações: %v", err)
@@ -81,15 +82,25 @@ func (m *MysqlClient) Init() {
 		Pass:      "admin",
 		IsAdmin:   "S",
 		BirthDate: time.Date(2003, 4, 10, 0, 0, 0, 0, time.UTC), // Corrigindo a data
+
 		
 	}
+	
 
 	// Salva o usuário admin no banco de dados
 	if err := m.db.Create(&admin).Error; err != nil {
 		log.Fatal().Err(err).Msg("❌ Erro ao criar usuário admin")
 	}
-
 	log.Info().Msg("✅ Usuário admin criado com sucesso!")
+	
+	adminImage:= models.UserImage{
+		Id_user: 0,
+		Img: []byte(ImageAdmin),
+	}
+	if err := m.db.Create(&adminImage).Error; err != nil {
+		log.Fatal().Err(err).Msg("❌ Erro ao criar imagem do admin")
+	}
+	log.Info().Msg("✅ Usuário admin criado com sucesso! e com foto")
 }
 
 // Métodos CRUD
@@ -120,6 +131,14 @@ func (m *MysqlClient) FindByID(id uint, model interface{}) (interface{}, error) 
 }
 func (m *MysqlClient) GetAll(model interface{}) (interface{}, error) {
 	err := m.db.Find(model).Error
+	if err != nil {
+		return nil, err
+	}
+	return model, nil
+}
+
+func (m *MysqlClient) FindImageByID(id uint, model interface{}) (interface{}, error) {
+	err := m.db.Where("id_user = ?", id).First(model).Error
 	if err != nil {
 		return nil, err
 	}

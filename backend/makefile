@@ -1,7 +1,7 @@
 # Makefile para gerenciamento do backend SGPG
 
 # Executa a aplicação Go localmente
-run-dev:
+run:
 	go mod tidy
 	go run cmd/api/main.go
 
