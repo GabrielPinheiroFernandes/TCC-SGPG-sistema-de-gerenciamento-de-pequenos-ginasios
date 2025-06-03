@@ -1,4 +1,8 @@
+import { GetUser } from "../api/endpoints/auth";
+import parseToken from "../auth/validate_token";
+
 export default function NavBar() {
+  // let user = GetUser(parseToken(localStorage.getItem("token")).id, localStorage.getItem("token"));
   return (
     <header className="w-full flex justify-between items-center px-6 py-4 bg-black text-white">
       <div className="text-2xl font-bold">
