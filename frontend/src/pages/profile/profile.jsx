@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/NavBar";
 import { User } from "../../constants/localstorage";
-import AdminProfile from "./components/admin";
-import UserProfile from "./components/user";
+import AdminProfile from "./components/admin/admin";
+import UserProfile from "./components/user/user";
 import Footer from "../../components/Footer";
 
 export default function Profile() {

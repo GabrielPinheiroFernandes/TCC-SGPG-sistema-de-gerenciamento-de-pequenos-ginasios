@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import InputText from "../../../components/InputText";
-import { User } from "../../../constants/localstorage";
-import Pic from "./image";
+import InputText from "../../../../components/InputText";
+import { User } from "../../../../constants/localstorage";
+import Pic from "./components/image";
 
 export default function UserProfile() {
   const user = localStorage.getItem(User);
