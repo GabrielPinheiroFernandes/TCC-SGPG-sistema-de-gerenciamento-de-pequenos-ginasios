@@ -81,6 +81,11 @@ func (m *MysqlClient) Init() {
 		Email:     "admin@admin.com",
 		Pass:      "admin",
 		IsAdmin:   "S",
+		Height:  1.70,
+		Weight: 100,
+		Sex: "M",
+		CPF: "000.000.000-00",
+
 		BirthDate: time.Date(2003, 4, 10, 0, 0, 0, 0, time.UTC), // Corrigindo a data
 
 		

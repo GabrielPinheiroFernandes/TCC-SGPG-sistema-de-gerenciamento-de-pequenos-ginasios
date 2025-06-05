@@ -15,9 +15,9 @@ type User struct {
 	IsAdmin   string         `gorm:"type:char(1);not null;default:'N'"` // 'S' ou 'N'
 	BirthDate time.Time      `gorm:"type:date;not null"`
 	Height    float64        `gorm:"type:decimal(4,2);not null"`
-	Weight    float64        `gorm:"type:decimal(4,2);not null"`
+	Weight    float64        `gorm:"type:decimal;not null"`
 	Sex       string         `gorm:"type:char(1);not null"`   // 'M' ou 'F'
-	CPF       string        `gorm:"type:varchar(11);unique"` // Opcional (nullable)
+	CPF       string        `gorm:"type:varchar(14);unique"` // Opcional (nullable)
 	CreatedAt time.Time      // Timestamp de criação
 	UpdatedAt time.Time      // Timestamp de atualização
 	DeletedAt gorm.DeletedAt `gorm:"index"` // Soft delete (opcional)
