@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Logint";
 import Register from "./pages/Register";
 import PrivateRoute from "./middlewares/PrivateRoute";
+import Profile from "./pages/profile/profile";
 
 function App() {
   return (
@@ -15,10 +16,10 @@ function App() {
 
         {/* Rotas protegidas */}
         <Route
-          path="/user"
+          path="/profile"
           element={
             <PrivateRoute>
-              <Register />
+             <Profile/>
             </PrivateRoute>
           }
         />

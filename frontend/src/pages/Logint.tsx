@@ -4,6 +4,7 @@ import images from "../constants/images"; // mantido
 import urls from "../constants/urls";
 import InputText from "../components/InputText";
 import { Navigate, useNavigate } from "react-router-dom";
+import { User_token } from "../constants/localstorage";
 
 // Instância personalizada do Axios
 const api = axios.create({
@@ -20,6 +21,9 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mensagem, setMensagem] = useState("");
+  if (localStorage.getItem(User_token)) {
+    return <Navigate to="/" />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

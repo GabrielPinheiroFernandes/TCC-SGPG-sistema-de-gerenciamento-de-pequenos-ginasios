@@ -1,17 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Koulen&display=swap');
+
 :root {
   /* Primary Blues */
-  --primary-blue: #044CAC;           /* Strong blue, great as a main brand color */
-  --light-blue: #A4C4E4;             /* Light blue, good for backgrounds or subtle highlights */
-  --medium-blue: #4C6594;            /* Mid-tone blue, nice for buttons or links */
-  --accent-blue: #3E5FA3;            /* A bolder blue for hover states or secondary buttons */
+  --primary-blue: #044CAC;
+  --light-blue: #A4C4E4;
+  --medium-blue: #4C6594;
+  --accent-blue: #3E5FA3;
 
   /* Grays & Neutrals */
-  --light-gray: #D9D9D9;             /* For backgrounds, dividers */
-  --medium-gray: #AEAEAE;            /* For borders or disabled elements */
-  --soft-gray: #AEB8CB;              /* A cooler gray, good for cards or background areas */
-  --text-gray: #959595;              /* Ideal for secondary text or placeholders */
+  --light-gray: #D9D9D9;
+  --medium-gray: #AEAEAE;
+  --soft-gray: #AEB8CB;
+  --text-gray: #959595;
 
   /* Basics */
-  --black: #000000;                  /* For headings, text, strong contrast */
-  --white: #FFFFFF;                  /* Base background, or text on dark areas */
+  --black: #000000;
+  --white: #FFFFFF;
 }

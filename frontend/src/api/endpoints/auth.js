@@ -1,19 +1,20 @@
 import axios from 'axios';
 import urls from '../../constants/urls';
 
-function LoginRequest(email, password) {
-    body={
-        "email": email,
-        "password": password
-    }
-    response=axios.post(urls.UrlApi+"/api/auth/login", body)
-
-    return response
+async function LoginRequest(email, password) {
+    const body = {
+        email: email,
+        password: password
+    };
+    const response = await axios.post(urls.UrlApi + "/api/auth/login", body);
+    return response.data; // <-- Aqui está o JSON já processado
 }
 
-function GetUser(id, token) {
-    response=axios.get(urls.UrlApi+"/user/"+id, {headers: {'Authorization': 'Bearer '+token}})
-    return response
+async function GetUser(id, token) {
+    const response = await axios.get(urls.UrlApi + "/user/" + id, {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    return response.data; // <-- Aqui também
 }
 
-export {LoginRequest, GetUser}
+export { LoginRequest, GetUser };
