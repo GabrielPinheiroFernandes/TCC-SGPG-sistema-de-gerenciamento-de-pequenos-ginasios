@@ -64,7 +64,7 @@ func (uRepo *UserRepository) GetUser(id int) (entitie.User, error) {
 				Cpf:          user.CPF,
 				Token:        "",
 				RefreshToken: "",
-				UserImage:    imageUser,
+				UserImage:    string(imageUser),
 			}, nil
 		}
 	}
@@ -150,7 +150,7 @@ func (uRepo *UserRepository) getUserImg(userID int) []byte {
 	var photo models.UserImage
 	res, err := uRepo.dbCli.FindImageByID(uint(userID), &photo)
 	if err != nil {
-		log.Error().Err(err).Msg("Erro ao buscar imagem do usuário")
+		log.Warn().Err(err).Msg("Erro ao buscar imagem do usuário")
 		return nil
 	}
 	if foundPhoto, ok := res.(*models.UserImage); ok {

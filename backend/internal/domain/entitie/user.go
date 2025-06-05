@@ -19,7 +19,7 @@ type User struct {
 	Cpf          string    `json:"cpf"`
 	Token        string    `json:"token,omitempty" gorm:"-"`
 	RefreshToken string    `json:"refresh_token,omitempty" gorm:"-"`
-	UserImage []byte `json:"user_image,omitempty" gorm:"-"`
+	UserImage string `json:"user_image,omitempty" gorm:"-"`
 }
 
 func (u *User) SetToken(token string) {

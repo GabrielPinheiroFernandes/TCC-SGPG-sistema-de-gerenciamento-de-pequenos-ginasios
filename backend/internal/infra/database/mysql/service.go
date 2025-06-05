@@ -94,7 +94,7 @@ func (m *MysqlClient) Init() {
 	log.Info().Msg("✅ Usuário admin criado com sucesso!")
 	
 	adminImage:= models.UserImage{
-		Id_user: 0,
+		Id_user: 1,
 		Img: []byte(ImageAdmin),
 	}
 	if err := m.db.Create(&adminImage).Error; err != nil {
