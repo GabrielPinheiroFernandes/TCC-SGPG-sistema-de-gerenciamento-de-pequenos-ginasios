@@ -2,11 +2,11 @@ import { Pencil } from "lucide-react";
 
 export default function Pic({ src }) {
   return (
-    <div className="relative w-full h-full group">
+    <div className="relative w-full aspect-square group">
       <img
         src={src}
         alt="Foto de perfil"
-        className="w-full h-full max-w-full max-h-full rounded-full border-4 border-blue-600 shadow-[0_8px_30px_rgba(0,0,0,0.8)] object-cover"
+        className="w-full h-full rounded-full border-4 border-blue-600 shadow-[0_8px_30px_rgba(0,0,0,0.8)] object-cover"
       />
       <button
         type="button"

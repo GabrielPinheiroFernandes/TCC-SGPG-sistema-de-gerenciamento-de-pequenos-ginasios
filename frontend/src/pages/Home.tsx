@@ -45,7 +45,11 @@ export default function Home() {
           style={{ backgroundImage: `url(${images.treino2})` }}
         >
           <div className="absolute inset-0 flex items-center justify-center">
-            <img src={images.logo} alt="Logo" className="w-40 h-40 object-contain" />
+            <img
+              src={images.logo}
+              alt="Logo"
+              className="w-40 h-40 object-contain"
+            />
           </div>
         </div>
         <div className="md:w-1/2 w-full bg-blue-800 flex items-center justify-center" />
@@ -85,7 +89,12 @@ export default function Home() {
                 className="p-3 rounded border border-gray-300"
               />
               <button
-                type="submit"
+                onClick={() =>
+                  window.open(
+                    "https://api.whatsapp.com/send?phone=5514982180923&text=Ol%C3%A1%21%20Gostaria%20de%20saber%20mais%20sobre%20a%20academia.%20Pode%20me%20passar%20mais%20informa%C3%A7%C3%B5es%3F%20%F0%9F%98%8A",
+                    "_blank"
+                  )
+                }
                 className="bg-blue-800 text-white py-3 rounded hover:bg-blue-700 font-semibold"
               >
                 MATRÍCULE-SE AGORA

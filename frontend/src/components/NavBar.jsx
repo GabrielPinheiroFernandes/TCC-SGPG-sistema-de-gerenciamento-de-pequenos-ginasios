@@ -17,7 +17,7 @@ export default function NavBar() {
           const parsed = parseToken(token);
           const { data, message } = await GetUser(parsed.id, token);
           localStorage.setItem(User, JSON.stringify(data));
-          setUserName(data.first_name);
+          setUserName(data.first_name + " " + data.last_name);
           setUserImage(data.user_image);
         } catch (error) {
           console.error("Erro ao buscar usuário:", error);
@@ -29,8 +29,11 @@ export default function NavBar() {
   }, [token]);
 
   return (
-   <header className="fixed top-0 left-0 right-0 z-50 w-full flex justify-between items-center px-6 py-4 bg-black text-white">
-      <button className="text-2xl font-bold hover:opacity-80" onClick={() => navigate("/")}>
+    <header className="fixed top-0 left-0 right-0 z-50 w-full flex justify-between items-center px-6 py-4 bg-black text-white">
+      <button
+        className="text-2xl font-bold hover:opacity-80"
+        onClick={() => navigate("/")}
+      >
         STUDIO <span className="text-blue-800">FOCUS</span>
       </button>
       <nav className="hidden md:flex space-x-6">
@@ -52,7 +55,12 @@ export default function NavBar() {
           }} // Troque pelo seu handler
           className="flex items-center space-x-2 hover:opacity-80"
         >
-          <span>{userName}</span>
+          <span
+            className="font-semibold"
+            style={{ fontFamily: "'Koulen', cursive" }}
+          >
+            {userName}
+          </span>
           {userImage && (
             <img
               src={`${userImage}`}
@@ -62,8 +70,11 @@ export default function NavBar() {
           )}
         </button>
       ) : (
-        <button className="bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Login / Cadastro
+        <button
+          className="bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-700"
+          onClick={() => navigate("/login")}
+        >
+          Fazer Login
         </button>
       )}
     </header>
