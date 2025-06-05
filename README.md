@@ -6,14 +6,14 @@ Este repositório centraliza o desenvolvimento de um sistema de gerenciamento pa
 O sistema visa simplificar e otimizar a gestão administrativa desses estabelecimentos, oferecendo funcionalidades que abordam as necessidades específicas do setor, como cadastro de alunos, verificação de matrículas, controle de acesso e relatórios analíticos. 📊
 
 ## Tecnologias Utilizadas 🛠️
-- **Backend:** Laravel (PHP) para o desenvolvimento de uma API robusta e escalável.
+- **Backend:** Golang (GO) para o desenvolvimento de uma API robusta e escalável.
 - **Frontend:** React (JavaScript) para criação de interfaces dinâmicas e responsivas.
 - **Banco de Dados:** MySQL para armazenamento e gerenciamento de dados relacionais.
 
 ## Estrutura do Repositório 📂
 Este repositório está organizado em duas principais pastas:
 
-1. **Backend**: Contém toda a infraestrutura do lado do servidor, incluindo a API RESTful.
+1. **Backend**: Contém toda a infraestrutura do lado do servidor, incluindo a API REST.
 2. **Frontend**: Inclui o código responsável pela interface do usuário e comunicação com a API.
 
 Cada pasta possuirá seu próprio arquivo `README.md` com instruções detalhadas para iniciar e configurar o respectivo projeto.
