@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { User } from "../../../../constants/localstorage";
 import Pic from "../user/components/image";
 import Card from "./components/card";
 
 export default function AdminProfile() {
+  const navigate = useNavigate();
+
   const user = localStorage.getItem(User);
   const userdata = user ? JSON.parse(user) : {};
 
@@ -15,7 +18,9 @@ export default function AdminProfile() {
   };
 
   const [formData, setFormData] = useState(originalData);
-
+  const studentsHandler = () => {
+    navigate("/students");
+  };
   useEffect(() => {
     setFormData(originalData);
   }, [user]);
@@ -45,13 +50,13 @@ export default function AdminProfile() {
       {/* Direita: 70% em md+ */}
       <div className="w-full md:w-[70%] flex flex-wrap justify-center items-center p-6 gap-6">
         <div className="w-full sm:w-[80%] md:w-[45%] lg:w-[30%]">
-          <Card />
+          <Card label="Dashboard"/>
         </div>
         <div className="w-full sm:w-[80%] md:w-[45%] lg:w-[30%]">
-          <Card />
+          <Card label="Alunos" onClick={studentsHandler} />
         </div>
         <div className="w-full sm:w-[80%] md:w-[45%] lg:w-[30%]">
-          <Card />
+          <Card label="Configurações" />
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 export default function Card({ label = "Título do Card", onClick }) {
+
   return (
     <button
       onClick={onClick}
@@ -12,7 +13,7 @@ export default function Card({ label = "Título do Card", onClick }) {
         <h1 className="text-2xl font-bold mb-2">{label}</h1>
         <hr className="border-t border-gray-300 w-24 mb-4" />
         <div className="bg-blue-500 text-white px-6 py-2 rounded-lg text-center pointer-events-none">
-          Ação
+          Ir
         </div>
       </div>
     </button>
