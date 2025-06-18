@@ -14,7 +14,7 @@ init-api:
 	docker compose build app && docker compose up -d app
 
 # Sobe o container mysql
-init-bd:
+init-db:
 	docker compose build db && docker compose up -d db
 # Para os containers
 stop:
