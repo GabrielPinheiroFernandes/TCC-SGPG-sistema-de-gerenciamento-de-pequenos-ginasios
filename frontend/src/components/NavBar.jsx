@@ -37,15 +37,10 @@ export default function NavBar() {
         STUDIO <span className="text-blue-800">FOCUS</span>
       </button>
       <nav className="hidden md:flex space-x-6">
-        <a href="#" className="hover:text-blue-400">
-          Treinos
+        <a href="/bioempendancia" className="hover:text-blue-400">
+          Bioempendância
         </a>
-        <a href="#" className="hover:text-blue-400">
-          Suplementação
-        </a>
-        <a href="#" className="hover:text-blue-400">
-          Aulas
-        </a>
+        
       </nav>
       {userName ? (
         <button

@@ -5,6 +5,8 @@ import Register from "./pages/Register";
 import PrivateRoute from "./middlewares/PrivateRoute";
 import Profile from "./pages/profile/profile";
 import Students from "./pages/profile/components/admin/components/students/students";
+import Student from "./pages/profile/components/admin/components/student/student";
+import Bioimpedancia from "./pages/bioempendance";
 
 function App() {
   return (
@@ -14,6 +16,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+         <Route path="/bioempendancia" element={<Bioimpedancia />} />
 
         {/* Rotas protegidas */}
         <Route
@@ -29,6 +32,14 @@ function App() {
           element={
             <PrivateRoute>
              <Students />
+            </PrivateRoute>
+          }
+        />
+         <Route
+          path="/students/:id"
+          element={
+            <PrivateRoute>
+             <Student />
             </PrivateRoute>
           }
         />

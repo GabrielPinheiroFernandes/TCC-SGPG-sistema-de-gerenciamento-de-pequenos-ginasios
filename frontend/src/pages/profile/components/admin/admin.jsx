@@ -55,9 +55,6 @@ export default function AdminProfile() {
         <div className="w-full sm:w-[80%] md:w-[45%] lg:w-[30%]">
           <Card label="Alunos" onClick={studentsHandler} />
         </div>
-        <div className="w-full sm:w-[80%] md:w-[45%] lg:w-[30%]">
-          <Card label="Configurações" />
-        </div>
       </div>
     </div>
   );
