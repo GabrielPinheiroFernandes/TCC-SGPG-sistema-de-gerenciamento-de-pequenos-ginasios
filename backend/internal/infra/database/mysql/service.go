@@ -55,6 +55,7 @@ func (m *MysqlClient) Init() {
 	err := m.db.AutoMigrate(
 		&models.User{}, // Adicione mais models aqui conforme necessário
 		&models.UserImage{},
+		&models.Installment{}, // <-- aqui
 	)
 	if err != nil {
 		log.Fatal().Msgf("❌ Erro ao rodar as migrações: %v", err)
@@ -148,4 +149,22 @@ func (m *MysqlClient) FindImageByID(id uint, model interface{}) (interface{}, er
 		return nil, err
 	}
 	return model, nil
+}
+
+// Busca por um único campo
+func (m *MysqlClient) FindByField(field string, value interface{}, out interface{}) (interface{}, error) {
+	err := m.db.Where(fmt.Sprintf("%s = ?", field), value).Find(out).Error
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Busca por dois campos (ex: id e user_id)
+func (m *MysqlClient) FindByTwoFields(field1 string, value1 interface{}, field2 string, value2 interface{}, out interface{}) (interface{}, error) {
+	err := m.db.Where(fmt.Sprintf("%s = ? AND %s = ?", field1, field2), value1, value2).First(out).Error
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }

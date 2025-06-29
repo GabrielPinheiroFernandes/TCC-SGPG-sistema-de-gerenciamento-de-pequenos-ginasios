@@ -20,15 +20,19 @@ func main() {
 
 	db.Init()
 
-	//usecase
+	// Repositórios
 	gatewayUser := repository.NweUserRepository(db)
+	gatewayInstallment := repository.NewInstallmentRepository(db)
 
-	//Auth
-	authRepo:=repository.NewJWTService()
-	authGateway:=usecase.NewAuthUsecase(authRepo)
-	
-	usecase := usecase.NewUserUsecase(gatewayUser,*authGateway)
+	// Auth
+	authRepo := repository.NewJWTService()
+	authUsecase := usecase.NewAuthUsecase(authRepo)
 
-	controller := controller.NewController(*usecase, *authGateway)
-	controller.Process()
+	// Usecases
+	userUsecase := usecase.NewUserUsecase(gatewayUser, *authUsecase)
+	installmentUsecase := usecase.NewInstallmentUsecase(gatewayInstallment)
+
+	// Controller
+	appController := controller.NewController(*userUsecase, *authUsecase, *installmentUsecase)
+	appController.Process()
 }

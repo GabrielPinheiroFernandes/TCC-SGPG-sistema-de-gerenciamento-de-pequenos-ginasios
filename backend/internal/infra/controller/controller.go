@@ -13,14 +13,16 @@ import (
 )
 
 type Controller struct {
-	user usecase.UserUsecase
-	auth usecase.AuthUsecase
+	user         usecase.UserUsecase
+	auth         usecase.AuthUsecase
+	installments usecase.InstallmentUsecase
 }
 
-func NewController(user usecase.UserUsecase, auth usecase.AuthUsecase) *Controller {
+func NewController(user usecase.UserUsecase, auth usecase.AuthUsecase, installments usecase.InstallmentUsecase) *Controller {
 	return &Controller{
-		user: user,
-		auth: auth,
+		user:         user,
+		auth:         auth,
+		installments: installments,
 	}
 }
 
@@ -116,8 +118,70 @@ func (cont *Controller) Process() {
 			})
 		})
 
-		userGroup.POST("/del", func(c *gin.Context) {
+		userGroup.DELETE("/del/:id", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"message": "Usuário deletado com sucesso"})
+		})
+	}
+	installmentsGroup := r.Group("/installments", cont.auth.AuthMiddleware()) // proteger se desejar
+	{
+		// Adiciona uma nova parcela
+		installmentsGroup.POST("/add", func(c *gin.Context) {
+			var inst entitie.Installment
+			if err := c.ShouldBindJSON(&inst); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido", "detalhe": err.Error()})
+				return
+			}
+			inserted, err := cont.installments.Add(inst)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao adicionar parcela"})
+				return
+			}
+			c.JSON(http.StatusCreated, gin.H{"message": "Parcela adicionada com sucesso", "data": inserted})
+		})
+
+		// Busca todas as parcelas de um usuário
+		installmentsGroup.GET("/:id_user", func(c *gin.Context) {
+			id, err := strconv.Atoi(c.Param("id_user"))
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+				return
+			}
+			all, err := cont.installments.GetAll(id)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar parcelas"})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"message": "Parcelas recuperadas com sucesso", "data": all})
+		})
+
+		// Busca uma parcela específica por ID e ID do usuário
+		installmentsGroup.GET("/:id_user/:id", func(c *gin.Context) {
+			idUser, err1 := strconv.Atoi(c.Param("id_user"))
+			id, err2 := strconv.Atoi(c.Param("id"))
+			if err1 != nil || err2 != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Parâmetros inválidos"})
+				return
+			}
+			inst, err := cont.installments.GetByID(id, idUser)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar parcela"})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"message": "Parcela recuperada com sucesso", "data": inst})
+		})
+
+		// Deleta uma parcela por ID
+		installmentsGroup.DELETE("/del/:id", func(c *gin.Context) {
+			id, err := strconv.Atoi(c.Param("id"))
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+				return
+			}
+			if err := cont.installments.Del(id); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao deletar parcela"})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"message": "Parcela deletada com sucesso"})
 		})
 	}
 
