@@ -1,53 +1,49 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { User } from "../../../../../../constants/localstorage";
+import { User, User_token } from "../../../../../../constants/localstorage";
 import DashBoardAside from "../dashboard_aside";
 import InputText from "../../../../../../components/InputText";
+import axios from "axios";
+import urls from "../../../../../../constants/urls";
 
 export default function Student() {
   const { id } = useParams();
-
+  const token = localStorage.getItem(User_token);
   const user = localStorage.getItem(User);
   const { first_name, user_image } = user ? JSON.parse(user) : {};
 
   const [student, setStudent] = useState(null);
   const [enrollments, setEnrollments] = useState([]);
 
+  const api = axios.create({
+    baseURL: urls.UrlApi,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   useEffect(() => {
-    // Simulação da requisição com estrutura real
-    const studentData = {
-      first_name: "Jhon",
-      last_name: "Doe",
-      email: "email.example@hotmail.com",
-      birth: "2000-04-10",
-      weight: "70 KG",
-      height: "1.80",
-      gender: "Masculino",
-      password: "********",
+    if (!id) return ;
+
+    const fetchData = async () => {
+      try {
+        const userRes = await api.get(`/user/${id}`);
+        const installmentsRes = await api.get(`/installments/${id}`);
+
+        setStudent(userRes.data.data);
+        setEnrollments(installmentsRes.data.data || []);
+      } catch (err) {
+        console.error("Erro ao buscar dados do aluno:", err);
+      }
     };
 
-    const enrollmentData = Array(150)
-      .fill(0)
-      .map((_, i) => ({
-        id: i + 1,
-        user_id: 10,
-        payment: 50,
-        payment_date: i === 2 ? null : "2026-04-10",
-        expiration_date: "2026-04-30",
-        payment_status: i === 2 ? false : true,
-        created_at: "2025-06-01T12:00:00Z",
-        updated_at: "2025-06-10T15:00:00Z",
-      }));
-
-    setStudent(studentData);
-    setEnrollments(enrollmentData);
+    fetchData();
   }, [id]);
 
   function updateEnrollment(index, updatedEnrollment) {
-    setEnrollments((oldEnrollments) =>
-      oldEnrollments.map((enrollment, i) =>
-        i === index ? updatedEnrollment : enrollment
-      )
+    setEnrollments((prev) =>
+      prev.map((item, i) => (i === index ? updatedEnrollment : item))
     );
   }
 
@@ -56,14 +52,11 @@ export default function Student() {
       className="flex flex-row w-full h-screen p-10 gap-4"
       style={{ background: "var(--primary-blue)" }}
     >
-      {/* Aside */}
       <div className="w-[20%] flex flex-col justify-start items-center h-full">
         <DashBoardAside name={first_name} pic={user_image} />
       </div>
 
-      {/* Conteúdo principal */}
       <main className="flex flex-1 flex-col gap-6 min-h-0 w-full h-full">
-        {/* Dados do usuário */}
         <section className="bg-white rounded-2xl p-6 shadow-md max-h-[350px] overflow-y-auto">
           <h2 className="text-center font-bold text-lg text-blue-700 mb-6">
             DADOS DO USUÁRIO
@@ -72,15 +65,17 @@ export default function Student() {
             <InputText label="PRIMEIRO NOME" value={student?.first_name} />
             <InputText label="SEGUNDO NOME" value={student?.last_name} />
             <InputText label="EMAIL" value={student?.email} />
-            <InputText label="SENHA" value={student?.password} />
-            <InputText label="DATA DE NASCIMENTO" value={student?.birth} />
+            <InputText label="SENHA" value="********" />
+            <InputText
+              label="DATA DE NASCIMENTO"
+              value={student?.birth_date?.split("T")[0]}
+            />
             <InputText label="PESO" value={student?.weight} />
             <InputText label="ALTURA" value={student?.height} />
-            <InputText label="SEXO" value={student?.gender} />
+            <InputText label="SEXO" value={student?.sex} />
           </div>
         </section>
 
-        {/* Matrículas */}
         <section
           className="bg-white rounded-2xl p-6 shadow-md flex-1 min-h-0 overflow-y-auto"
           style={{ maxHeight: "calc(100vh - 200px)" }}
@@ -89,13 +84,19 @@ export default function Student() {
             MATRÍCULAS
           </h2>
           <div className="flex flex-col gap-4 min-h-0">
-            {enrollments.map((mat, index) => (
-              <EnrollmentItem
-                key={mat.id}
-                enrollment={mat}
-                onChange={(updated) => updateEnrollment(index, updated)}
-              />
-            ))}
+            {enrollments.length === 0 ? (
+              <div className="text-center text-gray-500 text-sm">
+                Nenhuma parcela encontrada para este aluno.
+              </div>
+            ) : (
+              enrollments.map((mat, index) => (
+                <EnrollmentItem
+                  key={mat.id}
+                  enrollment={mat}
+                  onChange={(updated) => updateEnrollment(index, updated)}
+                />
+              ))
+            )}
           </div>
         </section>
       </main>
@@ -117,7 +118,7 @@ function EnrollmentItem({ enrollment, onChange }) {
     if (payment_status) {
       onChange({ ...enrollment, payment_status: false, payment_date: null });
     } else {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = new Date().toISOString().split("T")[0];
       onChange({ ...enrollment, payment_status: true, payment_date: today });
     }
   }

@@ -1,39 +1,51 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import InputText from "../../../../../../components/InputText";
-import { User } from "../../../../../../constants/localstorage";
+import { User, User_token } from "../../../../../../constants/localstorage";
 import DashBoardAside from "../dashboard_aside";
+import axios from "axios";
+import urls from "../../../../../../constants/urls";
 
 export default function Students() {
   const user = localStorage.getItem(User);
+  const token = localStorage.getItem(User_token);
   const { first_name, user_image } = user ? JSON.parse(user) : {};
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [students, setStudents] = useState([]);
 
+  const api = axios.create({
+    baseURL: urls.UrlApi,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   useEffect(() => {
-    const tempUserData = [
-      { id: 1, first_name: "Bruno", last_name: "dos Anjos", email: "o6wI1@example.com", cpf: "72625362887" },
-      { id: 2, first_name: "Fernanda", last_name: "Silva", email: "fsilva@example.com", cpf: "98765432100" },
-      { id: 3, first_name: "Lucas", last_name: "Martins", email: "lucasm@example.com", cpf: "11223344556" },
-      { id: 4, first_name: "Aline", last_name: "Costa", email: "aline.costa@example.com", cpf: "44556677889" },
-      { id: 5, first_name: "Carlos", last_name: "Souza", email: "carlos.souza@example.com", cpf: "99887766554" },
-    ];
+    const fetchStudents = async () => {
+      try {
+        const res = await api.get("/user/");
+        const userList = res.data?.data || [];
 
-    const delayDebounce = setTimeout(() => {
-      if (searchQuery.trim() === "") {
-        setStudents(tempUserData);
-        return;
+        if (searchQuery.trim() === "") {
+          setStudents(userList);
+        } else {
+          const filtered = userList.filter((user) =>
+            `${user.first_name} ${user.last_name}`
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+          setStudents(filtered);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar usuários:", err);
+        setStudents([]);
       }
+    };
 
-      const filtered = tempUserData.filter((user) =>
-        `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-      setStudents(filtered);
-    }, 300);
-
+    const delayDebounce = setTimeout(fetchStudents, 300);
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
@@ -42,7 +54,10 @@ export default function Students() {
   };
 
   return (
-    <div className="flex flex-row flex-1 w-full p-10 gap-4" style={{ background: "var(--primary-blue)" }}>
+    <div
+      className="flex flex-row flex-1 w-full p-10 gap-4"
+      style={{ background: "var(--primary-blue)" }}
+    >
       <div className="w-[20%] flex flex-col justify-center items-center">
         <DashBoardAside name={first_name} pic={user_image} />
       </div>
@@ -79,7 +94,9 @@ export default function Students() {
                     key={student.id}
                     onClick={() => handleClick(student.id)}
                     className={`cursor-pointer transition-all duration-200 ${
-                      index % 2 === 0 ? "bg-blue-700 text-white" : "bg-white text-blue-700"
+                      index % 2 === 0
+                        ? "bg-blue-700 text-white"
+                        : "bg-white text-blue-700"
                     } hover:brightness-90`}
                   >
                     <td className="py-3 px-4 uppercase">
