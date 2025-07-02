@@ -10,6 +10,7 @@ import (
 	"github.com/GabrielPinheiroFernandes/Estudos-GO/internal/usecase"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
 type Controller struct {
@@ -100,6 +101,7 @@ func (cont *Controller) Process() {
 			// Faz o binding do JSON pro struct
 			if err := c.ShouldBindJSON(&user); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"message": "JSON inválido", "error": err.Error()})
+				log.Error().Msgf("JSON inválido: %v", err)
 				return
 			}
 
