@@ -7,6 +7,7 @@ import Profile from "./pages/profile/profile";
 import Students from "./pages/profile/components/admin/components/students/students";
 import Student from "./pages/profile/components/admin/components/student/student";
 import Bioimpedancia from "./pages/bioempendance";
+import Dashboard from "./pages/profile/components/admin/components/dashboard/dashboard";
 
 function App() {
   return (
@@ -40,6 +41,14 @@ function App() {
           element={
             <PrivateRoute>
              <Student />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+             <Dashboard/>
             </PrivateRoute>
           }
         />

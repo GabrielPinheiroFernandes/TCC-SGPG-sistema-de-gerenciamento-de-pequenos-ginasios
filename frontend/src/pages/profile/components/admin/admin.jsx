@@ -21,6 +21,9 @@ export default function AdminProfile() {
   const studentsHandler = () => {
     navigate("/students");
   };
+   const dashboardsHandler = () => {
+    navigate("/dashboard");
+  };
   useEffect(() => {
     setFormData(originalData);
   }, [user]);
@@ -50,7 +53,7 @@ export default function AdminProfile() {
       {/* Direita: 70% em md+ */}
       <div className="w-full md:w-[70%] flex flex-wrap justify-center items-center p-6 gap-6">
         <div className="w-full sm:w-[80%] md:w-[45%] lg:w-[30%]">
-          <Card label="Dashboard"/>
+          <Card label="Dashboard" onClick={dashboardsHandler}/>
         </div>
         <div className="w-full sm:w-[80%] md:w-[45%] lg:w-[30%]">
           <Card label="Alunos" onClick={studentsHandler} />
