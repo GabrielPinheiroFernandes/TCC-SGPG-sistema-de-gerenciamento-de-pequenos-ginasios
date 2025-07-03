@@ -95,7 +95,7 @@ func (m *MysqlClient) Init() {
 
 	adminImage := models.UserImage{
 		Id_user: 1,
-		Img:     []byte(ImageAdmin),
+		Img:    ImageAdmin,
 	}
 	if err := m.db.Create(&adminImage).Error; err != nil {
 		log.Fatal().Err(err).Msg("❌ Erro ao criar imagem do admin")

@@ -9,4 +9,5 @@ type UserClient interface {
 	GetAllUser() ([]entitie.User, error)
 	GetUser(id int) (entitie.User, error)
 	GetAuthUser(entitie.Auth) (entitie.User, error)
+	InsertUserPhoto(userID int, base64photo string) error
 }

@@ -116,6 +116,34 @@ func (cont *Controller) Process() {
 			}
 			c.JSON(http.StatusOK, gin.H{"message": "Sucesso ao pegar todos os usuarios", "data": users})
 		})
+		userGroup.POST("/upload-photo", func(c *gin.Context) {
+			log.Trace().Msg("Inserindo foto do usuário")
+
+			var payload struct {
+				UserID      int    `json:"userId"`
+				PhotoBase64 string `json:"photoBase64"`
+			}
+
+			if err := c.ShouldBindJSON(&payload); err != nil {
+				log.Error().Err(err).Msg("JSON inválido no upload de foto")
+				c.JSON(http.StatusBadRequest, gin.H{"message": "JSON inválido", "error": err.Error()})
+				return
+			}
+
+			if payload.UserID == 0 || payload.PhotoBase64 == "" {
+				c.JSON(http.StatusBadRequest, gin.H{"message": "Campos userId e photoBase64 são obrigatórios"})
+				return
+			}
+
+			err := cont.user.InsertUserPhoto(payload.UserID, payload.PhotoBase64)
+			if err != nil {
+				log.Error().Err(err).Msg("Erro ao salvar foto do usuário")
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Erro ao salvar foto do usuário"})
+				return
+			}
+
+			c.JSON(http.StatusOK, gin.H{"message": "Foto do usuário salva com sucesso"})
+		})
 
 		userGroup.GET(":id", func(c *gin.Context) {
 			log.Trace().Msg("Buscando usuário por ID")

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/GabrielPinheiroFernandes/Estudos-GO/internal/infra/database"
 	"github.com/GabrielPinheiroFernandes/Estudos-GO/internal/infra/database/mysql/models"
 	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
 )
 
 type UserRepository struct {
@@ -221,15 +223,44 @@ func parseIsAdmin(flag string) bool {
 	}
 }
 
-func (uRepo *UserRepository) getUserImg(userID int) []byte {
+func (uRepo *UserRepository) getUserImg(userID int) string {
 	var photo models.UserImage
 	res, err := uRepo.dbCli.FindImageByID(uint(userID), &photo)
 	if err != nil {
 		log.Warn().Err(err).Msg("Erro ao buscar imagem do usuário")
-		return nil
+		return ""
 	}
 	if foundPhoto, ok := res.(*models.UserImage); ok {
 		return foundPhoto.Img
 	}
-	return nil
+	return ""
+}
+func (uRepo *UserRepository) InsertUserPhoto(userID int, base64photo string) error {
+	// Valida o base64 se quiser (opcional)
+	if !strings.HasPrefix(base64photo, "data:image/") {
+		return errors.New("formato base64 inválido")
+	}
+
+	var existing models.UserImage
+	res, err := uRepo.dbCli.FindByField("id_user", uint(userID), &existing)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	if res != nil {
+		// Atualiza imagem existente
+		if img, ok := res.(*models.UserImage); ok && img.ID != 0 {
+			img.Img = base64photo // salva como string base64
+			return uRepo.dbCli.Update(img)
+		}
+	}
+
+	// Não achou imagem, cria nova
+	newImg := models.UserImage{
+		Id_user: uint(userID),
+		Img:     base64photo, // salva como string base64
+	}
+
+	_, err = uRepo.dbCli.Insert(&newImg)
+	return err
 }

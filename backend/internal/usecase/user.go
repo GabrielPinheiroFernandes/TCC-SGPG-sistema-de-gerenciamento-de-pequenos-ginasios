@@ -68,3 +68,7 @@ func (repo *UserUsecase) GetAuthUser(u entitie.Auth) (entitie.User, error) {
 	}
 	return user, nil
 }
+
+func (repo *UserUsecase) InsertUserPhoto(userID int, base64photo string) error {
+	return repo.userRepository.InsertUserPhoto(userID, base64photo)
+}

@@ -1,7 +1,7 @@
 package models
 
 type UserImage struct {
-	ID      uint   `gorm:"primaryKeyakakkak"`
-	Id_user uint   // FK para User.ID
-	Img     []byte `gorm:"type:longblob"`
+	ID      uint   `gorm:"primaryKey"`
+	Id_user uint
+	Img     string `gorm:"type:LONGTEXT"` // ou TEXT, depende do tamanho
 }
