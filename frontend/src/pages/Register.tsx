@@ -3,11 +3,10 @@ import axios from "axios";
 import images from "../constants/images"; // mantido
 import urls from "../constants/urls";
 import InputText from "../components/InputText";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-// Instância personalizada do Axios
 const api = axios.create({
-  baseURL: urls.UrlApi, // ✅ coloque a URL certa da sua API
+  baseURL: urls.UrlApi,
   headers: {
     "Content-Type": "application/json",
   },
@@ -15,32 +14,42 @@ const api = axios.create({
 
 export default function Register() {
   const navigate = useNavigate();
-  let a = urls.UrlApi;
-  console.log(a);
+
+  // Campos independentes
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [mensagem, setMensagem] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMensagem("Fazendo login...");
+
+    if (password !== confirmPassword) {
+      setMensagem("❌ As senhas não coincidem.");
+      return;
+    }
 
     try {
-      const response = await api.post("/auth/login", {
+      const response = await api.post("/auth/register", {
+        first_name: firstName,
+        last_name: lastName,
         email,
-        password,
+        cpf,
+        pass: password,
       });
 
       console.log(response.data);
-
-      setMensagem("✅ Login realizado com sucesso!");
+      setMensagem("✅ Cadastro realizado com sucesso!");
       localStorage.setItem("token", response.data.user.token);
-      navigate("/register");
+      navigate("/");
     } catch (error: any) {
       if (error.response?.data?.message) {
         setMensagem(`❌ ${error.response.data.message}`);
       } else {
-        setMensagem(`❌ Erro ao fazer login. Verifique seus dados. ${error}`);
+        setMensagem(`❌ Erro ao cadastrar. ${error.message}`);
       }
     }
   };
@@ -79,7 +88,6 @@ export default function Register() {
 
       {/* Formulário */}
       <section className="w-full flex justify-center items-center py-16 px-4 bg-white flex-col">
-        {/* Linha com texto e botão de cadastro */}
         <div className="flex flex-row gap-2 pb-20 items-center justify-center">
           <h1 className="text-gray-800 text-lg">Já possui uma conta ?</h1>
           <button
@@ -90,30 +98,29 @@ export default function Register() {
           </button>
         </div>
 
-        {/* Card branco com borda, sombra e padding */}
         <div className="w-full max-w-[800px] bg-white border border-gray-200 shadow-xl rounded-2xl p-10">
           <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
             FAÇA SEU <span className="text-blue-800">CADASTRO</span>
           </h2>
 
-          {/* Formulário com espaçamento vertical */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="w-full flex-row flex gap-4">
               <InputText
                 type="text"
                 label="Primeiro Nome"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 required
               />
               <InputText
                 type="text"
                 label="Segundo Nome"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
                 required
               />
             </div>
+
             <InputText
               type="email"
               label="E-mail"
@@ -121,6 +128,15 @@ export default function Register() {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+
+            <InputText
+              type="text"
+              label="CPF"
+              value={cpf}
+              onChange={(e) => setCpf(e.target.value)}
+              required
+            />
+
             <div className="w-full flex-row flex gap-4">
               <InputText
                 type="password"
@@ -132,23 +148,17 @@ export default function Register() {
               <InputText
                 type="password"
                 label="Confirmar Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
             </div>
-            <InputText
-              type="cpf"
-              label="CPF"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+
             <button
               type="submit"
               className="bg-blue-800 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
             >
-              ENTRAR
+              CADASTRAR
             </button>
 
             {mensagem && (

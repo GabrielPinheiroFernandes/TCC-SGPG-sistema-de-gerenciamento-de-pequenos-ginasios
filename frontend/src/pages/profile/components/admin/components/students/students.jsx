@@ -68,7 +68,10 @@ export default function Students() {
   const handleAddUser = async () => {
     const userToSend = {
       ...newUser,
-      is_admin: false, // Forçado no envio
+      height: Number(newUser.height),
+      weight: Number(newUser.weight),
+      birth_date: new Date(newUser.birth_date).toISOString(),
+      is_admin: false,
     };
 
     try {
@@ -163,31 +166,73 @@ export default function Students() {
               </h2>
 
               <div className="grid grid-cols-1 gap-4">
-                {/* Inputs - removendo is_admin e sex */}
-                {Object.entries(newUser)
-                  .filter(([key]) => key !== "sex")
-                  .map(([key, value]) => {
-                    let inputType = "text";
-                    if (key === "pass") inputType = "password";
-                    else if (key === "birth_date") inputType = "date";
+                <InputText
+                  label="Nome"
+                  type="text"
+                  value={newUser.first_name}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, first_name: e.target.value }))
+                  }
+                />
+                <InputText
+                  label="Sobrenome"
+                  type="text"
+                  value={newUser.last_name}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, last_name: e.target.value }))
+                  }
+                />
+                <InputText
+                  label="Email"
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, email: e.target.value }))
+                  }
+                />
+                <InputText
+                  label="Senha"
+                  type="password"
+                  value={newUser.pass}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, pass: e.target.value }))
+                  }
+                />
+                <InputText
+                  label="Data de Nascimento"
+                  type="date"
+                  value={newUser.birth_date}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, birth_date: e.target.value }))
+                  }
+                />
+                <InputText
+                  label="Altura (cm)"
+                  type="number"
+                  value={newUser.height}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, height: Number(e.target.value) }))
+                  }
+                />
+                <InputText
+                  label="Peso (kg)"
+                  type="number"
+                  value={newUser.weight}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, weight: Number(e.target.value) }))
+                  }
+                />
+                <InputText
+                  label="CPF"
+                  type="text"
+                  maxLength={11}
+                  value={newUser.cpf}
+                  onChange={(e) => {
+                    const onlyNums = e.target.value.replace(/\D/g, "").slice(0, 11);
+                    setNewUser((prev) => ({ ...prev, cpf: onlyNums }));
+                  }}
+                />
 
-                    return (
-                      <InputText
-                        key={key}
-                        label={key.replace("_", " ").toUpperCase()}
-                        type={inputType}
-                        value={value}
-                        onChange={(e) =>
-                          setNewUser((prev) => ({
-                            ...prev,
-                            [key]: e.target.value,
-                          }))
-                        }
-                      />
-                    );
-                  })}
-
-                {/* Botões de rádio para sexo */}
                 <div className="flex items-center gap-6 mt-2">
                   <label className="flex items-center gap-2">
                     <input
