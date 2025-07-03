@@ -244,6 +244,7 @@ export default function UserProfile() {
               fontWeight: "bold",
             }}
           >
+            
             Cancelar
           </button>
           <button
