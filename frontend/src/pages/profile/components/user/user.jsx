@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import InputText from "../../../../components/InputText";
-import { User } from "../../../../constants/localstorage";
+import { User, User_token } from "../../../../constants/localstorage";
 import Pic from "./components/image";
+import axios from "axios";
+import urls from "../../../../constants/urls";
 
 export default function UserProfile() {
   const user = localStorage.getItem(User);
   const userdata = user ? JSON.parse(user) : {};
 
   const originalData = {
+    id: userdata.id || "",
     first_name: userdata.first_name || "",
     last_name: userdata.last_name || "",
     email: userdata.email || "",
@@ -44,8 +47,36 @@ export default function UserProfile() {
   }
 
   function handleSave() {
-    console.log("Salvando dados:", formData);
-    // salvar no localStorage, chamar API, etc
+    const userId = userdata.id;
+    if (!userId) {
+      console.error("ID do usuário não informado.");
+      return;
+    }
+
+    const payload = {
+      ...formData,
+      height: formData.height ? parseFloat(formData.height) : null,
+      weight: formData.weight ? parseFloat(formData.weight) : null,
+      birth_date: formData.birth_date ? new Date(formData.birth_date).toISOString() : null,
+    };
+
+    axios
+      .put(`${urls.UrlApi}/user/${userId}`, payload, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem(User_token)}`,
+        },
+      })
+      .then((res) => {
+        console.log("Usuário atualizado com sucesso:", res.data);
+        localStorage.setItem(User, JSON.stringify(res.data.data || payload));
+        alert("Perfil atualizado com sucesso!");
+        setHasChanges(false);
+      })
+      .catch((err) => {
+        console.error("Erro ao salvar usuário:", err);
+        alert("Erro ao salvar o perfil.");
+      });
   }
 
   function calculateIMC(weight, height) {
@@ -121,123 +152,70 @@ export default function UserProfile() {
         </div>
 
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6">
-          {/* Campos de entrada */}
           <div className="flex flex-row gap-4 mb-4 w-full">
             <div className="flex-1">
-              <InputText
-                label="Primeiro Nome"
-                value={formData.first_name}
-                onChange={handleChange("first_name")}
-              />
+              <InputText label="Primeiro Nome" value={formData.first_name} onChange={handleChange("first_name")} />
             </div>
             <div className="flex-1">
-              <InputText
-                label="Segundo Nome"
-                value={formData.last_name}
-                onChange={handleChange("last_name")}
-              />
+              <InputText label="Segundo Nome" value={formData.last_name} onChange={handleChange("last_name")} />
             </div>
           </div>
 
           <div className="flex flex-row gap-4 mb-4 w-full">
             <div className="flex-1">
-              <InputText
-                label="Email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange("email")}
-              />
+              <InputText label="Email" type="email" value={formData.email} onChange={handleChange("email")} />
             </div>
             <div className="flex-1">
-              <InputText
-                label="Senha"
-                type="password"
-                value={formData.pass}
-                onChange={handleChange("pass")}
-              />
+              <InputText label="Senha" type="password" value={formData.pass} onChange={handleChange("pass")} />
             </div>
           </div>
 
           <div className="flex flex-row gap-4 mb-4 w-full">
             <div className="flex-1">
-              <InputText
-                label="Data de Nascimento"
-                type="date"
-                value={formData.birth_date}
-                onChange={handleChange("birth_date")}
-              />
+              <InputText label="Data de Nascimento" type="date" value={formData.birth_date} onChange={handleChange("birth_date")} />
             </div>
             <div className="flex-1">
-              <InputText
-                label="Altura (cm)"
-                type="number"
-                value={formData.height}
-                onChange={handleChange("height")}
-              />
+              <InputText label="Altura (cm)" type="number" value={formData.height} onChange={handleChange("height")} />
             </div>
           </div>
 
           <div className="flex flex-row gap-4 mb-4 w-full">
             <div className="flex-1">
-              <InputText
-                label="Peso (kg)"
-                type="number"
-                value={formData.weight}
-                onChange={handleChange("weight")}
-              />
+              <InputText label="Peso (kg)" type="number" value={formData.weight} onChange={handleChange("weight")} />
             </div>
             <div className="flex-1">
-              <InputText
-                label="Sexo"
-                type="text"
-                value={formData.sex}
-                onChange={handleChange("sex")}
-              />
+              <InputText label="Sexo" type="text" value={formData.sex} onChange={handleChange("sex")} />
             </div>
           </div>
 
-          {/* Cálculos */}
           <div className="flex flex-row gap-4 mb-4 w-full">
             <div className="flex-1">
-              <label
-                className="font-bold bg-gray-200 flex items-center justify-center rounded-2xl text-center p-2"
-                style={{ fontFamily: "'Koulen', sans-serif" }}
-              >
-                Índice de Massa Corporal (IMC): {calculateIMC(formData.weight, formData.height)}
+              <label className="font-bold bg-gray-200 flex items-center justify-center rounded-2xl text-center p-2" style={{ fontFamily: "'Koulen', sans-serif" }}>
+                IMC: {calculateIMC(formData.weight, formData.height)}
               </label>
             </div>
             <div className="flex-1">
-              <label
-                className="font-bold bg-gray-200 flex items-center justify-center rounded-2xl text-center p-2"
-                style={{ fontFamily: "'Koulen', sans-serif" }}
-              >
-                Taxa Metabólica Basal (TMB): {calculateTMB(formData.weight, formData.height, formData.birth_date, formData.sex)}
+              <label className="font-bold bg-gray-200 flex items-center justify-center rounded-2xl text-center p-2" style={{ fontFamily: "'Koulen', sans-serif" }}>
+                TMB: {calculateTMB(formData.weight, formData.height, formData.birth_date, formData.sex)}
               </label>
             </div>
           </div>
 
           <div className="flex flex-row gap-4 mb-4 w-full">
             <div className="flex-1">
-              <label
-                className="font-bold bg-gray-200 flex items-center justify-center rounded-2xl text-center p-2"
-                style={{ fontFamily: "'Koulen', sans-serif" }}
-              >
-                Calorias diárias (estimadas): {calculateCalorias(formData.weight, formData.height, formData.birth_date, formData.sex)}
+              <label className="font-bold bg-gray-200 flex items-center justify-center rounded-2xl text-center p-2" style={{ fontFamily: "'Koulen', sans-serif" }}>
+                Calorias diárias: {calculateCalorias(formData.weight, formData.height, formData.birth_date, formData.sex)}
               </label>
             </div>
             <div className="flex-1">
-              <label
-                className="font-bold bg-gray-200 flex items-center justify-center rounded-2xl text-center p-2"
-                style={{ fontFamily: "'Koulen', sans-serif" }}
-              >
-                Estimativa de Gordura Corporal (BF%): {estimateBF(formData.weight, formData.height, formData.sex)}
+              <label className="font-bold bg-gray-200 flex items-center justify-center rounded-2xl text-center p-2" style={{ fontFamily: "'Koulen', sans-serif" }}>
+                BF% estimado: {estimateBF(formData.weight, formData.height, formData.sex)}
               </label>
             </div>
           </div>
         </div>
       </form>
 
-      {/* Botões flutuantes */}
       {hasChanges && (
         <div
           style={{
