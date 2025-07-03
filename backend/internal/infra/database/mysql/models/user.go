@@ -13,14 +13,17 @@ type User struct {
 	Email     string         `gorm:"type:varchar(500);unique;not null"`
 	Pass      string         `gorm:"type:varchar(255);not null"`        // Aqui será o hash da senha
 	IsAdmin   string         `gorm:"type:char(1);not null;default:'N'"` // 'S' ou 'N'
-	BirthDate time.Time      `gorm:"type:date;not null"`
-	Height    float64        `gorm:"type:decimal(4,2);not null"`
-	Weight    float64        `gorm:"type:decimal;not null"`
-	Sex       string         `gorm:"type:char(1);not null"`   // 'M' ou 'F'
-	CPF       string        `gorm:"type:varchar(14);unique"` // Opcional (nullable)
-	CreatedAt time.Time      // Timestamp de criação
-	UpdatedAt time.Time      // Timestamp de atualização
-	DeletedAt gorm.DeletedAt `gorm:"index"` // Soft delete (opcional)
+
+	// Os campos abaixo agora são opcionais (nullable)
+	BirthDate *time.Time     `gorm:"type:date"`             // Nullable
+	Height    *string       `gorm:"type:decimal(10,0)"`     // Nullable
+	Weight    *string       `gorm:"type:decimal(10,0)"`    // Nullable
+	Sex       *string        `gorm:"type:char(1)"`          // 'M' ou 'F', Nullable
+	CPF       *string        `gorm:"type:varchar(14);unique"` // Nullable
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"` // Soft delete
 }
 
 func (u *User) GetID() int {

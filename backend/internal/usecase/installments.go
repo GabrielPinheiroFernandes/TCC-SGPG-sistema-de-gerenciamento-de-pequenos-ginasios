@@ -19,6 +19,10 @@ func (uc *InstallmentUsecase) Add(installment entitie.Installment) (entitie.Inst
 	return uc.installmentRepo.AddInstallment(installment)
 }
 
+func (uc *InstallmentUsecase) Update(installment entitie.Installment) (entitie.Installment, error) {
+	return uc.installmentRepo.UpdateInstallment(installment)
+}
+
 func (uc *InstallmentUsecase) Del(id int) error {
 	return uc.installmentRepo.DellInstallment(id)
 }

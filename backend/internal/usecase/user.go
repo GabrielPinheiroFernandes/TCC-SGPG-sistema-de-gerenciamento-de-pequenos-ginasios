@@ -26,15 +26,23 @@ func (repo *UserUsecase) Add(user entitie.User) (entitie.User, error) {
 	token, err := repo.authRepo.Login(int(insertedUser.ID))
 	if err != nil {
 		return entitie.User{}, err
-
 	}
 
 	insertedUser.SetToken(token)
 
 	return insertedUser, nil
 }
-func (repo *UserUsecase) Del() error {
-	return nil
+
+func (repo *UserUsecase) Update(user entitie.User) (entitie.User, error) {
+	updatedUser, err := repo.userRepository.UpdateUser(user)
+	if err != nil {
+		return entitie.User{}, err
+	}
+	return updatedUser, nil
+}
+
+func (repo *UserUsecase) Del(id int) error {
+	return repo.userRepository.DellUser(id)
 }
 
 func (repo *UserUsecase) GetAll() ([]entitie.User, error) {
@@ -44,16 +52,17 @@ func (repo *UserUsecase) GetAll() ([]entitie.User, error) {
 	}
 	return users, nil
 }
+
 func (uRepo *UserUsecase) GetUser(id int) (entitie.User, error) {
-	userRet,err:=uRepo.userRepository.GetUser(id)
+	userRet, err := uRepo.userRepository.GetUser(id)
 	if err != nil {
 		return entitie.User{}, err
 	}
-
-	return userRet,nil
+	return userRet, nil
 }
+
 func (repo *UserUsecase) GetAuthUser(u entitie.Auth) (entitie.User, error) {
-	user,err:=repo.userRepository.GetAuthUser(u)
+	user, err := repo.userRepository.GetAuthUser(u)
 	if err != nil {
 		return entitie.User{}, err
 	}

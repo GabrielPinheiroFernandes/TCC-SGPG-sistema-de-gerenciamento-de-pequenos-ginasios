@@ -21,7 +21,7 @@ func main() {
 	db.Init()
 
 	// Repositórios
-	gatewayUser := repository.NweUserRepository(db)
+	gatewayUser := repository.NewUserRepository(db)
 	gatewayInstallment := repository.NewInstallmentRepository(db)
 
 	// Auth

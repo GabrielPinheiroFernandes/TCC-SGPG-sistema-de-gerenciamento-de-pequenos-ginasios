@@ -30,6 +30,7 @@ func (iRepo *InstallmentRepository) AddInstallment(inst entitie.Installment) (en
 
 	inserted, err := iRepo.dbCli.Insert(&model)
 	if err != nil {
+		log.Error().Err(err).Msg("Erro ao adicionar parcela")
 		return entitie.Installment{}, err
 	}
 
@@ -45,6 +46,28 @@ func (iRepo *InstallmentRepository) AddInstallment(inst entitie.Installment) (en
 	}
 
 	return entitie.Installment{}, fmt.Errorf("erro ao salvar parcela")
+}
+
+func (iRepo *InstallmentRepository) UpdateInstallment(inst entitie.Installment) (entitie.Installment, error) {
+	model := models.Installment{
+		ID:             inst.ID,
+		UserID:         inst.UserID,
+		Payment:        inst.Payment,
+		PaymentDate:    inst.PaymentDate,
+		ExpirationDate: inst.ExpirationDate,
+		PaymentStatus:  inst.PaymentStatus,
+		CreatedAt:      inst.CreatedAt,
+		UpdatedAt:      inst.UpdatedAt,
+		DeletedAt:      inst.DeletedAt,
+	}
+
+	err := iRepo.dbCli.Update(&model)
+	if err != nil {
+		log.Error().Err(err).Interface("installment", inst).Msg("Erro ao atualizar parcela")
+		return entitie.Installment{}, err
+	}
+
+	return inst, nil
 }
 
 func (iRepo *InstallmentRepository) DellInstallment(id int) error {
@@ -68,6 +91,10 @@ func (iRepo *InstallmentRepository) GetAllInstallment(idUser int) ([]entitie.Ins
 			PaymentDate:    item.PaymentDate,
 			ExpirationDate: item.ExpirationDate,
 			PaymentStatus:  item.PaymentStatus,
+			CreatedAt:      item.CreatedAt,
+			UpdatedAt:      item.UpdatedAt,
+			DeletedAt:      item.DeletedAt,
+			
 		})
 	}
 

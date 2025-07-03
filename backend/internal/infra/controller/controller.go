@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -39,12 +41,14 @@ func (cont *Controller) Process() {
 	}))
 
 	r.GET("/ping", func(c *gin.Context) {
+		log.Trace().Msg("Ping recebido")
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
 
 	authGroup := r.Group("/auth")
 	{
 		authGroup.POST("/login", func(c *gin.Context) {
+			log.Trace().Msg("Iniciando login")
 			var user entitie.Auth
 			if err := c.ShouldBindJSON(&user); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido"})
@@ -71,78 +75,275 @@ func (cont *Controller) Process() {
 
 			c.JSON(http.StatusOK, gin.H{"message": "Usuário logado com sucesso!", "user": userValid})
 		})
-	}
-	userGroup := r.Group("/user", cont.auth.AuthMiddleware())
-	{
-		userGroup.GET("/", func(c *gin.Context) {
-			a, err := cont.user.GetAll()
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido"})
-				return
-			}
-			c.JSON(http.StatusOK, gin.H{"message": "Sucesso ao pegar todos os usuarios", "data": a})
-		})
-		userGroup.GET("/:id", func(c *gin.Context) {
-			id, err := strconv.Atoi(c.Param("id"))
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido"})
-				return
-			}
-			a, err := cont.user.GetUser(id)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido"})
-				return
-			}
-			c.JSON(http.StatusOK, gin.H{"message": "Sucesso ao pegar todos os usuarios", "data": a})
-		})
-		userGroup.POST("/add", func(c *gin.Context) {
-			var user entitie.User
 
-			// Faz o binding do JSON pro struct
+		authGroup.POST("/register", func(c *gin.Context) {
+			log.Trace().Msg("Iniciando registro de usuário")
+			var user entitie.User
 			if err := c.ShouldBindJSON(&user); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"message": "JSON inválido", "error": err.Error()})
-				log.Error().Msgf("JSON inválido: %v", err)
 				return
 			}
 
-			// Aqui chama o método do repositório
 			userInserted, err := cont.user.Add(user)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"message": "Erro ao adicionar usuário"})
 				return
 			}
 
-			fmt.Printf("%+v\n", userInserted)
+			token, err := cont.auth.Login(userInserted.ID)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Erro ao gerar token após registro"})
+				return
+			}
+
+			userInserted.SetToken(token)
 
 			c.JSON(http.StatusCreated, gin.H{
-				"message": "Usuário adicionado com sucesso!",
-				"data":    userInserted,
+				"message": "Usuário registrado e logado com sucesso!",
+				"user":    userInserted,
 			})
+		})
+	}
+
+	userGroup := r.Group("/user", cont.auth.AuthMiddleware())
+	{
+		userGroup.GET("/", func(c *gin.Context) {
+			log.Trace().Msg("Buscando todos os usuários")
+			users, err := cont.user.GetAll()
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Erro ao buscar usuários"})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"message": "Sucesso ao pegar todos os usuarios", "data": users})
+		})
+
+		userGroup.GET(":id", func(c *gin.Context) {
+			log.Trace().Msg("Buscando usuário por ID")
+			id, err := strconv.Atoi(c.Param("id"))
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+				return
+			}
+			user, err := cont.user.GetUser(id)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar usuário"})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"message": "Sucesso ao pegar usuário", "data": user})
+		})
+
+		userGroup.POST("/add", func(c *gin.Context) {
+			log.Trace().Msg("Adicionando novo usuário")
+
+			// Lê o body em map para manipular os campos problemáticos
+			var userMap map[string]interface{}
+			bodyBytes, err := io.ReadAll(c.Request.Body)
+			if err != nil {
+				log.Error().Err(err).Msg("Erro ao ler body")
+				c.AbortWithStatus(http.StatusBadRequest)
+				return
+			}
+
+			// Log do body recebido
+			log.Info().Str("user", string(bodyBytes)).Msg("Body da requisição")
+
+			if err := json.Unmarshal(bodyBytes, &userMap); err != nil {
+				log.Error().Err(err).Msg("Erro ao fazer unmarshal do JSON")
+				c.JSON(http.StatusBadRequest, gin.H{"message": "JSON inválido", "error": err.Error()})
+				return
+			}
+
+			// Tratar o campo height
+			if val, ok := userMap["height"]; ok {
+				switch v := val.(type) {
+				case float64:
+					str := fmt.Sprintf("%.2f", v)
+					userMap["height"] = &str
+				case string:
+					userMap["height"] = &v
+				default:
+					userMap["height"] = nil
+				}
+			} else {
+				userMap["height"] = nil
+			}
+
+			// Tratar o campo weight
+			if val, ok := userMap["weight"]; ok {
+				switch v := val.(type) {
+				case float64:
+					str := fmt.Sprintf("%.0f", v)
+					userMap["weight"] = &str
+				case string:
+					userMap["weight"] = &v
+				default:
+					userMap["weight"] = nil
+				}
+			} else {
+				userMap["weight"] = nil
+			}
+
+			// Converter o map para struct entitie.User
+			b, err := json.Marshal(userMap)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Erro ao processar dados"})
+				return
+			}
+
+			var user entitie.User
+			if err := json.Unmarshal(b, &user); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"message": "Erro ao converter dados", "error": err.Error()})
+				return
+			}
+
+			userInserted, err := cont.user.Add(user)
+			if err != nil {
+				log.Error().Err(err).Msg("Erro ao adicionar usuário")
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Erro ao adicionar usuário"})
+				return
+			}
+
+			log.Info().Interface("user", userInserted).Msg("Usuário adicionado com sucesso")
+			c.JSON(http.StatusCreated, gin.H{"message": "Usuário adicionado com sucesso!", "data": userInserted})
+		})
+
+		userGroup.PUT(":id", func(c *gin.Context) {
+			log.Trace().Msg("Atualizando usuário")
+
+			id, err := strconv.Atoi(c.Param("id"))
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+				return
+			}
+
+			// Para evitar erros de unmarshalling em float64 vs string, vamos receber o JSON em map[string]interface{}
+			var userMap map[string]interface{}
+			if err := c.ShouldBindJSON(&userMap); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"message": "JSON inválido", "error": err.Error()})
+				return
+			}
+
+			// Parse seguro para height *string
+			if val, ok := userMap["height"]; ok {
+				switch v := val.(type) {
+				case float64:
+					str := fmt.Sprintf("%.2f", v)
+					userMap["height"] = &str
+				case string:
+					userMap["height"] = &v
+				default:
+					userMap["height"] = nil
+				}
+			} else {
+				userMap["height"] = nil
+			}
+
+			// Parse seguro para weight *string
+			if val, ok := userMap["weight"]; ok {
+				switch v := val.(type) {
+				case float64:
+					str := fmt.Sprintf("%.0f", v)
+					userMap["weight"] = &str
+				case string:
+					userMap["weight"] = &v
+				default:
+					userMap["weight"] = nil
+				}
+			} else {
+				userMap["weight"] = nil
+			}
+
+			// Agora converte map para struct entitie.User
+			b, err := json.Marshal(userMap)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Erro ao processar dados"})
+				return
+			}
+
+			var user entitie.User
+			if err := json.Unmarshal(b, &user); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"message": "Erro ao converter dados", "error": err.Error()})
+				return
+			}
+
+			user.ID = id
+
+			updated, err := cont.user.Update(user)
+			if err != nil {
+				log.Error().Err(err).Msg("Erro ao atualizar usuário")
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Erro ao atualizar usuário"})
+				return
+			}
+
+			c.JSON(http.StatusOK, gin.H{"message": "Usuário atualizado com sucesso", "data": updated})
 		})
 
 		userGroup.DELETE("/del/:id", func(c *gin.Context) {
+			log.Trace().Msg("Deletando usuário")
+			id, err := strconv.Atoi(c.Param("id"))
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+				return
+			}
+			if err := cont.user.Del(id); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao deletar usuário"})
+				return
+			}
 			c.JSON(http.StatusOK, gin.H{"message": "Usuário deletado com sucesso"})
 		})
 	}
-	installmentsGroup := r.Group("/installments", cont.auth.AuthMiddleware()) // proteger se desejar
+
+	installmentsGroup := r.Group("/installments", cont.auth.AuthMiddleware())
 	{
-		// Adiciona uma nova parcela
 		installmentsGroup.POST("/add", func(c *gin.Context) {
+			log.Trace().Msg("Adicionando nova parcela")
 			var inst entitie.Installment
 			if err := c.ShouldBindJSON(&inst); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido", "detalhe": err.Error()})
+				log.Warn().Err(err).Interface("payload", inst).Msg("Erro ao parsear JSON recebido")
+				c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido", "detail": err.Error(), "payload": inst})
 				return
 			}
+
 			inserted, err := cont.installments.Add(inst)
 			if err != nil {
+				log.Error().Err(err).Interface("installment", inst).Msg("Erro ao adicionar parcela")
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao adicionar parcela"})
 				return
 			}
+
+			log.Info().Interface("inserted", inserted).Msg("Parcela adicionada com sucesso")
 			c.JSON(http.StatusCreated, gin.H{"message": "Parcela adicionada com sucesso", "data": inserted})
 		})
 
-		// Busca todas as parcelas de um usuário
-		installmentsGroup.GET("/:id_user", func(c *gin.Context) {
+		installmentsGroup.PUT(":id", func(c *gin.Context) {
+			log.Trace().Msg("Atualizando parcela")
+			id, err := strconv.Atoi(c.Param("id"))
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+				return
+			}
+
+			var inst entitie.Installment
+			if err := c.ShouldBindJSON(&inst); err != nil {
+				log.Error().Err(err).Msg("Erro ao fazer bind do JSON para atualização")
+				c.JSON(http.StatusBadRequest, gin.H{"message": "JSON inválido", "detail": err.Error()})
+				return
+			}
+
+			inst.ID = id
+			updated, err := cont.installments.Update(inst)
+			if err != nil {
+				log.Error().Err(err).Msg("Erro ao atualizar parcela")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao atualizar parcela"})
+				return
+			}
+
+			log.Info().Interface("updated", updated).Msg("Parcela atualizada com sucesso")
+			c.JSON(http.StatusOK, gin.H{"message": "Parcela atualizada com sucesso", "data": updated})
+		})
+
+		installmentsGroup.GET(":id_user", func(c *gin.Context) {
+			log.Trace().Msg("Buscando parcelas de usuário")
 			id, err := strconv.Atoi(c.Param("id_user"))
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
@@ -156,8 +357,8 @@ func (cont *Controller) Process() {
 			c.JSON(http.StatusOK, gin.H{"message": "Parcelas recuperadas com sucesso", "data": all})
 		})
 
-		// Busca uma parcela específica por ID e ID do usuário
-		installmentsGroup.GET("/:id_user/:id", func(c *gin.Context) {
+		installmentsGroup.GET(":id_user/:id", func(c *gin.Context) {
+			log.Trace().Msg("Buscando parcela específica")
 			idUser, err1 := strconv.Atoi(c.Param("id_user"))
 			id, err2 := strconv.Atoi(c.Param("id"))
 			if err1 != nil || err2 != nil {
@@ -172,8 +373,8 @@ func (cont *Controller) Process() {
 			c.JSON(http.StatusOK, gin.H{"message": "Parcela recuperada com sucesso", "data": inst})
 		})
 
-		// Deleta uma parcela por ID
 		installmentsGroup.DELETE("/del/:id", func(c *gin.Context) {
+			log.Trace().Msg("Deletando parcela")
 			id, err := strconv.Atoi(c.Param("id"))
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
